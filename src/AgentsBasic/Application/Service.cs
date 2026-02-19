@@ -33,6 +33,8 @@ public class Service(IOptions<AzureAiSettings> settings)
                 Instructions = instructions
             });
         AgentVersion agent = await client.Agents.CreateAgentVersionAsync(agentName: agentName, creationOptions);
+        //client.Agents.UpdateAgentAsync(agent.Name, new AgentVersionCreationOptions(
+        //    new PromptAgentDefinition(model:)))
         return new AgentResult(agent.Name, agent.Version);
     }
 
@@ -60,15 +62,10 @@ public class Service(IOptions<AzureAiSettings> settings)
             [ResponseItem.CreateUserMessageItem(userInput)],
             settings.Value.Model)
         {
-            //ConversationOptions = new ResponseConversationOptions(conversationId),
+            ConversationOptions = new ResponseConversationOptions(conversationId),
             //PreviousResponseId = previousResponseId
         };
-
-        var teste = client.OpenAI.Conversations.GetProjectConversationsAsync(record);
-        await foreach(var t in teste)
-        {
-            Console.WriteLine(t);
-        }
+        
         var result = await responseClient.CreateResponseAsync(options);
         return new ResponseResult(result.Value.GetOutputText(), result.Value.Id);
     }
